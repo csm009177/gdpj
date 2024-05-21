@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Grid with GPS</title>
+    <style>
+        #photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-width: 600px;
+        }
+        .photo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .photo-item img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+        }
+        .photo-item .gps-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>사진 선택</h1>
+    <button id="cameraButton">촬영하기</button>
+    <button id="albumButton">앨범</button>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+    <input type="file" id="albumInput" accept="image/*" style="display: none;">
+    <div id="photo-grid"></div>
+
+    <script>
+        document.getElementById('cameraButton').addEventListener('click', function() {
+            document.getElementById('cameraInput').click();
+        });
+
+        document.getElementById('albumButton').addEventListener('click', function() {
+            document.getElementById('albumInput').click();
+        });
+
+        document.getElementById('cameraInput').addEventListener('change', handleFileSelect);
+        document.getElementById('albumInput').addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            if (event.target.files && event.target.files[0]) {
+                let file = event.target.files[0];
+                let imgURL = URL.createObjectURL(file);
+                addPhotoToGrid(imgURL);
+                getGPSInfo();
+            }
+        }
+
+        function addPhotoToGrid(imgURL) {
+            let photoGrid = document.getElementById('photo-grid');
+            let photoItem = document.createElement('div');
+            photoItem.classList.add('photo-item');
+
+            let imgElement = document.createElement('img');
+            imgElement.src = imgURL;
+            photoItem.appendChild(imgElement);
+
+            let gpsInfo = document.createElement('div');
+            gpsInfo.classList.add('gps-info');
+            gpsInfo.textContent = 'Loading GPS info...';
+            photoItem.appendChild(gpsInfo);
+
+            photoGrid.appendChild(photoItem);
+        }
+
+        function getGPSInfo() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    updateGPSInfo(lat, lon);
+                }, function(error) {
+                    console.error(error);
+                    updateGPSInfo(null, null, error.message);
+                });
+            } else {
+                updateGPSInfo(null, null, 'GPS를 지원하지 않는 브라우저입니다');
+            }
+        }
+
+        function updateGPSInfo(lat, lon, errorMsg) {
+            let gpsInfos = document.querySelectorAll('.photo-item:last-child .gps-info');
+            gpsInfos.forEach(gpsInfo => {
+                if (errorMsg) {
+                    gpsInfo.textContent = errorMsg; // Display error message
+                } else {
+                    gpsInfo.textContent = `Latitude: ${lat.toFixed(5)}, Longitude: ${lon.toFixed(5)}`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera and Album</title>
+    <style>
+        #photo-display {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>사진 선택</h1>
+    <button id="cameraButton">촬영하기</button>
+    <button id="albumButton">앨범</button>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+    <input type="file" id="albumInput" accept="image/*" style="display: none;">
+    <img id="photo-display" alt="Selected photo will appear here">
+
+    <script>
+        document.getElementById('cameraButton').addEventListener('click', function() {
+            document.getElementById('cameraInput').click();
+        });
+
+        document.getElementById('albumButton').addEventListener('click', function() {
+            document.getElementById('albumInput').click();
+        });
+
+        document.getElementById('cameraInput').addEventListener('change', function(event) {
+            if (event.target.files && event.target.files[0]) {
+                let imgElement = document.getElementById('photo-display');
+                imgElement.src = URL.createObjectURL(event.target.files[0]);
+            }
+        });
+
+        document.getElementById('albumInput').addEventListener('change', function(event) {
+            if (event.target.files && event.target.files[0]) {
+                let imgElement = document.getElementById('photo-display');
+                imgElement.src = URL.createObjectURL(event.target.files[0]);
+            }
+        });
+    </script>
+</body>
+</html>
